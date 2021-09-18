@@ -1,0 +1,8 @@
+Get string before a character:
+=LEFT(D3,(FIND(",",D3,1)-1))
+
+Get string after a character:
+=RIGHT(D3,LEN(D3)-FIND(",",D3))
+
+Concat:
+=CONCAT(H3," ",G3)
