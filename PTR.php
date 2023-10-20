@@ -13,13 +13,15 @@ $name_folder = "PTR"; //Put the name of the folder to be used throughout the scr
 $name_script = "PTR"; //Put the name of the script to be used throughout the script.
 $email_error = "gerard.reyes@maximintegrated.com"; //Put whom to send email for error handling.
 $email_debug = "gerard.reyes@maximintegrated.comx"; //Put whom to send email for debugging purpose implode by "," for multiple email recipients.
-mail($email_debug, $name_script . " SCRIPT", "START");
+//mail($email_debug, $name_script . " SCRIPT", "START");
 
 //Path for logs.
 $path = file_exists("/var/www/" . $name_folder) ? "/var/www/" . $name_folder : "C:/xampp/htdocs/" . $name_folder;
 $path_root = file_exists("/var/www/" . $name_folder) ? "/var/www/" : "C:/xampp/htdocs/";
 $dir_logs = $path . $name_folder . "/LOGS/";
 $dir_text = $path . $name_folder . "/TEXT/";
+
+$GLOBALS['branch'] = !empty($_GET['branch']) ? $_GET['branch'] : 'TUSLIA';
 
 //Logs start.
 $var_start_time = time() + microtime();
@@ -42,11 +44,42 @@ PROGRAM_PROPER($link_main);
 $var_end_time = time() + microtime();
 ECHO_AND_LOG_ME("\r\nDONE. (" . number_format($var_end_time - $var_start_time, 1) . " s.).\r\n");
 ECHO_AND_LOG_ME("END : " . date("Y-m-d H:i:s", time()) . "\r\n");
-mail($email_debug, $name_script . " SCRIPT", "END");
+//mail($email_debug, $name_script . " SCRIPT", "END");
 
 ###########################################################
 ###                 FUNCTIONS                           ###
 ###########################################################
+function GET_ADDRESS() {
+	$branch = $GLOBALS['branch'];
+	
+	if ($branch == 'TUSLIA') {
+		$array = [
+			'address_1' => 'La Fuerza Bldg, Chino Roces',
+			'address_2' => 'Makati',
+			];
+	} elseif ($branch == 'QUOLIA') {
+		$array = [
+			'address_1' => 'Quolia Address 1st line',
+			'address_2' => 'Quolia Address 2nd line',
+			];
+	} elseif ($branch == 'SKALIA') {
+		$array = [
+			'address_1' => 'Skalia Address 1st line',
+			'address_2' => 'Skalia Address 2nd line',
+			];
+	} elseif ($branch == 'CELESLIA') {
+		$array = [
+			'address_1' => 'Celeslia Address 1st line',
+			'address_2' => 'Celeslia Address 2nd line',
+			];
+	} else {
+		$array = [
+			'address_1' => 'La Fuerza Bldg, Chino Roces',
+			'address_2' => 'Makati',
+			];
+	}
+	return $array;
+}
 
 function OPEN_LINK_MYSQLI_DIRECT($hostname, $username, $password) {
     $con = mysqli_connect($hostname, $username, $password);
@@ -152,10 +185,14 @@ function PROGRAM_PROPER($link) {
     global $path;
     ECHO_AND_LOG_ME("\r\nPROGRAM PROPER: MAIN LINK: " . $link->host_info . "\r\n");
     ECHO_AND_LOG_ME("Good day! Today is: " . date("Y-m-d H:i:s") . "\r\n");
+	
+	$address = GET_ADDRESS();
 
     EXECUTE_QUERY_MYSQLI("TRUNCATE ptr.ptr;", $link);
     $query = "LOAD DATA INFILE '" . $path . "/Process_me.csv' INTO TABLE ptr.ptr FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;";
     EXECUTE_QUERY_MYSQLI($query, $link);
+	
+	//print_r($gerard); die;
 
     $array_data = GET_ALL_ROW_MYSQLI("SELECT * FROM ptr.ptr;", $link);
 //    print_r($array_data);
@@ -177,7 +214,9 @@ function PROGRAM_PROPER($link) {
 //    $add_me_to_right_for_profession = 2;
 //    $add_me_to_left_for_tin = 6;
 //    $add_me_for_next_page = 46;
-    //Font Size 10.5
+
+	/*
+    //Font Size 10.5 - before moving Makati to below
     $parameter_left = 8;
     $parameter_right = array(4, 21, 38);
     $add_me_to_left_for_profession = 1;
@@ -186,6 +225,19 @@ function PROGRAM_PROPER($link) {
     $add_me_to_right_for_address = 1;
     $add_me_to_left_for_tin = 5;
     $add_me_for_next_page = 41;
+	*/
+	
+    //Font Size 10.5
+    $parameter_left = 8;
+    $parameter_right = array(3, 20, 37);
+    $add_me_to_left_for_profession = 1;
+    $add_me_to_right_for_profession = 3;
+    $add_me_to_left_for_address = 3;
+    $add_me_to_right_for_address = 2;
+    $add_me_to_left_for_tin = 5;
+	$add_me_to_right_for_tin = 1;
+    $add_me_for_next_page = 41;
+	
 //    foreach ($parameter_right as $value) {
 //        $array_put_data_here_second_row[] = $value + $add_me_to_left_for_tin;
 //    }
@@ -207,11 +259,31 @@ function PROGRAM_PROPER($link) {
         $cell->activate;
         $cell->value = 'INSURANCE AGENT';
 
+		/*
         $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_address, $parameter_right[$counter_right_increment] + $add_me_to_right_for_address);
         $cell->activate;
         $cell->value = 'La Fuerza Bldg, Chino Roces, Makati';
+		*/
+		
+		/*
+        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_address, $parameter_right[$counter_right_increment] + $add_me_to_right_for_address);
+        $cell->activate;
+        $cell->value = 'La Fuerza Bldg, Chino Roces';
 
-        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_tin, $parameter_right[$counter_right_increment]);
+        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_address + 1, $parameter_right[$counter_right_increment] + $add_me_to_right_for_address);
+        $cell->activate;
+        $cell->value = 'Makati';
+		*/
+		
+        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_address, $parameter_right[$counter_right_increment] + $add_me_to_right_for_address);
+        $cell->activate;
+        $cell->value = $address['address_1'];
+
+        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_address + 1, $parameter_right[$counter_right_increment] + $add_me_to_right_for_address);
+        $cell->activate;
+        $cell->value = $address['address_2'];
+
+        $cell = $sheets->Cells($parameter_left + $add_me_to_left_for_tin, $parameter_right[$counter_right_increment] + $add_me_to_right_for_tin);
         $cell->activate;
         $cell->value = $value['tin'];
 
